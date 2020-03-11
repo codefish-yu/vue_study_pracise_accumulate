@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>directive全局自定义指令</title>
+</head>
+<body>
+    <!-- v-focus为全局自定义指令 -->
+    <input type="text" class="form-control" v-model="keywords" id="search" v-focus>
+
+    <script>
+        //使用Vue.directive()定义全局的指令,v-focus
+        //参数1:指令的名称,在定义的时候,指令的名层前面不需要加v-前缀,但在调用时必须再指令名称前加v-
+        //参数2:是一个对象,这个对象身上,有一些指令相关的函数,这些函数可以再特定的阶段,执行相关的操作
+        Vue.directive('focus',{
+            //钩子函数:每当指令绑定到元素上的时候,会立即执行这个bind函数,只执行一次
+            bind:function(el){
+                //注意:在每个函数中,第一个参数,永远是el,表示被绑定了指令的那个元素,这个el参数,是一个原生的js对象(dom对象)
+                //在元素刚绑定了指令的时候,还没有插入到dom中去,这时候调用focus方法没有作用,因为一个元素只有插入DOM之后才能获取焦点
+
+                el: focus()
+            },
+            //钩子函数:表示元素插入到dom中的时候,会执行inserted函数,只触发一次
+            inserted: function(el){
+                //该操作将元素插入到DOM树中去
+                el.focus()
+            },
+            //钩子函数:当VNode更新的时候,会执行updated,可能会触发多次
+            updated: function(){el},
+        })
+    </script>
+</body>
+</html>

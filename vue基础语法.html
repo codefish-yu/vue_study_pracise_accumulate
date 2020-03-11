@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue基础语法格式</title>
+    <!-- 导入vue包-->
+    <script src="static/js/vue.js"></script>
+</head>
+<body>
+    <!-- 写一个页面标签,之后vue对象会操作该标签 -->
+    <div id="app">
+        <p id="content">{{ msg }}</p>
+    </div>
+    <script>
+        //创建一个vue的实例
+        //当我们导入包之后,在浏览器的内存中,我们就多了一个vue构造函数
+        let vm = new Vue({
+            el: '#app', //表示该vue要控制的页面元素区域
+            data: { //data属性中存放el中要用到的数据,是mvvm模型的m部分
+                msg:'加油学习vue'   
+            }
+        })
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>computed计算属性</title>
+    <script src='static/js/vue.js'></script>
+</head>
+<body>
+    <div id='app'>
+        <input type="text" v-model="firstname">
+        <input type="text" v-model="lastname">
+        <input type="text" v-model="fullname">
+
+        <!-- 接下来再调用fullname,不会重新计算了,因为在fullname内部数据没有变化的时候,他的值是已经缓存好的-->
+        <p>{{ fullname }}</p>
+        <p>{{ fullname }}</p>
+        <p>{{ fullname }}</p>
+        <p>{{ fullname }}</p>
+
+    </div>
+
+    <script>
+        //创建vue实例
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                firstname: '',
+                lastname: '',
+            },
+            methods: {},
+
+            //计算属性
+            //特点:本质是方法,但是使用时通过属性的方法来使用(不加())
+            //计算属性内的function内部中任何data发生改变,会自动重新触发计算属性函数
+            //计算属性的求值结果会被缓存起来,方便下次直接使用,如果计算属性方法中
+            computed: {
+                //将fullname定义到computed中
+                //如果在外界引用了computed中的fullname属性,就会自动触发他的函数
+                fullname: function(){
+                    //当修改一次时,console.log只会触发一次,因为fullname已经缓存好了
+                    console.log('ok')
+                    return this.firstname + '-' + this.lastname
+            }},
+        })
+    </script>
+
+
+</body>
+</html>

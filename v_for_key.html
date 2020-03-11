@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>v-for的Key属性使用</title>
+    <script src='static/js/vue.js'></script>
+</head>
+<body>
+    <div id='app'>
+        <div >
+            <label>id
+                <input type="text" v-model='id'>
+            </label>
+
+            <label>name
+                    <input type="text" v-model='name'>
+                </label>
+            
+            <input type="button" value='添加' @click='add'>
+        </div>
+        
+        <!-- 在每次for循环时指定key,对应一个item.id(item.id是唯一的) -->
+        <!-- 注意:v-for循环时,属性key只能使用string或number-->
+        <!-- 必须使用v-bind属性绑定的形式指定key的值 -->
+        <!-- key用于-for时的数据关联 ,尽量都写-->
+        <p v-for='item in list' :key='item.id'>
+            <input type="checkbox">
+            {{ item.id }} --- {{ item.name }}
+        </p>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                id: '',
+                name: '',
+                list:[
+                    {id: 1, name: '李斯'},
+                    {id: 2, name: '赢政'},
+                    {id: 3, name: '赵高'},
+                    {id: 4, name: '韩非'},
+                    {id: 5, name: '荀子'},
+                    
+                ]
+        },
+        methods: {
+            add(){
+                this.list.push({
+                    id: this.id,
+                    name: this.name
+                })
+            }
+        }
+        })
+    </script>
+</body>
+</html>

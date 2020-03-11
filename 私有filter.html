@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>filter私有过滤器</title>
+</head>
+<body>
+    <div id='app'>
+        //调用过滤器,如果有私有过滤器,优先调用私有过滤器
+        <h3>{{ dt | dateFormat }}</h3>
+    </div>
+    <script>
+
+        var vm2 = new Vue({
+            el: '#app',
+            data: {
+                dt: new Date()
+            },
+            methods: {},
+
+            //局部过滤器,连个组成部分:过滤器名称和处理函数
+            filters: {
+                dateFormat: function(dateStr,pattern=''){
+                    var dt = new Date(dateStr)
+                }
+            }
+
+        })
+    </script>
+</body>
+</html>

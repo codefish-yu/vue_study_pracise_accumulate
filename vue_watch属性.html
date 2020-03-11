@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue的watch属性-使用watch属性实现姓名功能案例</title>
+    <script src="static/js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 使用v-model双向绑定input文本框中的数据和vue_data属性中的数据,让他们同步改变-->
+        <input type="text" v-model="firstname">
+        <input type="text" v-model="lastname">
+        <input type="text" v-model="fullname">
+    </div>
+    <script>
+        //创建vue实例,得到viewModel
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                firstname: '',
+                lastname: '',
+                fullname: ''
+            },
+            methods: {},
+            //使用watch属性,可以监视data中指定数据的变化,然后触发这个watch中对应的处理函数
+            watch:{ 
+                //监听data中的firstname属性,当firstname值改变时触发执行函数
+                firstname:function(){
+                    this.fullname = this.firstname + '-' + this.lastname
+                },
+                lastname: function(){
+                    this.fullname = this.firstname + '-' + this.lastname
+                }
+            }
+        })
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>filter全局过滤器</title>
+    <script src='./static/js/vue.js'></script>
+</head>
+<body>
+    <div id="app">
+        <!--过滤器调用时候的格式 :{{ name |nameope }},通过管道符的方式添加过滤器-->
+        <!-- 疯狂是给第二个参数arg传参 -->
+        <p>{{ msg | msgFormat{'疯狂'} }}</p>
+    </div>
+    <script>
+        //定义一个VUe全局的过滤器,名字叫做msgFormat
+        //过滤器的调用语法,过滤器的函数的参数data用于拿到{{ name }}
+        //作用:将单纯替换为邪恶
+        //使用正则:/单纯/g全局匹配
+        Vue.filter('msgFormat',function(msg,arg){
+            return msg.replace(/单纯/g,'邪恶')
+        })
+
+        //可添加多个过滤器
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                msg: '曾经我也是一个单纯的少年,现在不再单纯了'
+            },
+            methods:{}
+        })
+       
+       
+
+    </script>
+    
+
+</body>
+</html>
