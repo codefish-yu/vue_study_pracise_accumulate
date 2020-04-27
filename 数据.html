@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 在差值表达式中直接书写数据的key来访问数据-->
+        {{ info }}
+    </div>
+
+</body>
+<script src="static/js/vue.js"></script>
+<script>
+    let app = new Vue({
+            // 挂载到标签 
+            el: '#app',
+            // 用实例成员data给差值表达式提供数据
+            data: {
+                info: 'message'
+                }
+            })
+</script>
+<script>
+    //在vue对象外部访问vue对象
+    console.log(app);
+    //访问vue中的数据,要加$符
+    console.log(app.$data.info);
+    //或者直接访问
+    console.log(app.info);
+</script>
+</html>

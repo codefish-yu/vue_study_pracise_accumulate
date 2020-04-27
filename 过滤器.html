@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>过滤器</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 差值表达式可以直接做简单运算 -->
+        <p>{{ num + 1 }}</p>
+        <p>{{ msg.split('')[4] }}</p>
+        <!-- 过滤器,管道符前面的相当于是参数，传进过滤器中 -->
+        <p>{{ num | f1 }}</p>
+        <p>{{ 10,20,30,40 | f2 }}</p>
+        <!-- 部分过滤 -->
+        <p>{{ 10, 20 | f2(50, 80) }}</p>
+        <!-- 只传1个参数时,函数定义了多个参数，不传的部分为undefine-->
+        <p>{{ 120 | f2 }}</p>
+        <!-- 前台函数如果多传了参数，也可以，多传的会默认遗弃 -->
+    </div>    
+</body>
+<script src="static/js/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            num: 100,
+            msg: 'message'
+        },
+        // 过滤器
+        filters: {
+            f1: function(num){
+                return num * 2
+            },
+            f2: function(a,b,c,d){
+                console.log(a, b, c, d);
+                return a + b + c + d
+
+            }
+        }
+    })
+</script>
+</html>

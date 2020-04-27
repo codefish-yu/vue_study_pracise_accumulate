@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文本指令</title>
+</head>
+<body>
+    <div id="app">
+            <p>{{ info }}</p>
+            <!-- v-指令名="变量名",变量是需要data提供数据值的 -->
+            <p v-text="info"></p>
+            <!-- 常量 -->
+            <p v-text="123"></p>
+            <!-- 常量 -->
+            <p v-text="true"></p>
+            <!-- 常量和变量拼接 -->
+            <p v-text="'abc' + info"></p>
+            <!-- 识别标签 -->
+            <p v-html="'<b>好的</b>'"></p>
+    </div>
+</body>
+<script src="static/js/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            info: 'data提供的数据'
+        }
+    })
+</script>
+</html>
