@@ -17,8 +17,8 @@
             <p v-text="true"></p>
             <!-- 常量和变量拼接 -->
             <p v-text="'abc' + info"></p>
-            <!-- 识别标签 -->
-            <p v-html="'<b>好的</b>'"></p>
+            <!-- v-html识别标签,有三层引号，所以使用到了反引号 -->
+            <p v-html="`<b style='color:red'>好的</b>`"></p>
     </div>
 </body>
 <script src="static/js/vue.js"></script>

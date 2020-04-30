@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>事件指令：作用同jq的事件,要去绑定事件</title>
+    <style>
+        /*让用户不能选中文本 */
+        body {
+            user-select: none;
+        }
+        .low-num {
+            cursor: pointer;
+        }
+        /* 伪类选择器:悬浮上去再变红 */
+        .low-num:hover {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 事件指令：v-on: 事件名='事件函数名' -->
+        <p class="low-num" v-on:click="lowNum">
+            <span>点击一下减1:</span>
+            <span>{{ num }}</span>
+        </p>
+        <p v-on:dblclick="dblAction">双击</p>
+    </div>
+    
+</body>
+<script src="static/js/vue.js"></script>
+<script>
+    let app = new Vue({
+        el: '#app',
+        data: {
+            num: 99
+        },
+        methods: {
+            lowNum: function () {
+                // 在vue实例内部的方法中使用变量
+                //this表示当前兑现的一个引用,这里当前对象就是vue实例
+                //--自减
+                this.num--
+            },
+            dblAction () {
+                alert('双击事件')
+            }
+        }
+    })
+</script>
+</html>

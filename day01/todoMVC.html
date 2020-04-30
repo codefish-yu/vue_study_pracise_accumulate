@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TodoMVC</title>
+
+    <style>
+        /* 让有v-cloak属性的标签，解决插值表达式闪烁问题 */
+        [v-cloak] {display: none;}
+      </style>
+    <link rel="stylesheet" href="static/css/index.css">
+    <script src="static/js/vue.js"></script>
+</head>
+<body>
+    <section class="todoapp">
+        <!-- app头部 -->
+        <header class="header">
+          <!-- 大标题 -->
+          <h1>todos</h1>
+
+          <!-- 添加todo栏 -->
+          <!-- 增 -->
+          <!-- v-on绑定keyup.enter回车事件触发addTodo函数-->
+          <!-- 使用v-model，让input标签和data区域双向绑定数据：newTodo,同步改变的v层和m层的值-->
+          <!-- newTodo为todo栏用户正在编辑键入的数据-->
+          <input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="newTodo" @keyup.enter="addTodo"/>
+
+        </header>
+  
+        <!-- todos栏 -->
+        <!-- 查 -->
+        <!-- 当有todos时(todos.length不为0), 显示,否则不显示-->
+        <section class="main" v-show="todos.length" v-cloak>
+  
+          <!-- 全选复选框 -->
+          <!-- 功能:当全选复选框被勾选时,全选时未完成数显示为0,显示clear completed按钮-->
+          <!-- 使用v-model绑定计算属性allDown -->
+          <input id="toggle-all" class="toggle-all" type="checkbox" v-model="allDone"/>
+          <!-- lable标签绑定上面的id="toggle-all"的表单元素-->
+          <label for="toggle-all"></label>
+  
+          <!-- todo列表和编辑区域 -->
+          <!--功能:根据过滤选项(all,active,completed)的结果filterTodos显示todolist-->
+          <ul class="todo-list">
+            <!-- 使用v-bind为class属性绑定数据,绑定的数据可作为js执行-->
+            <!-- filteredTodo是动态数据,想到使用vue_computed属性-->
+            <!-- v-for的key属性用于循环时与数据(这里是todo.id)绑定,建议都写-->
+            <!-- :class 动态切换已完成时和编辑时样式-->
+            <li
+              v-for="todo in filteredTodos"
+              class="todo"
+              :key="todo.id"
+              :class="{ completed: todo.completed, editing: todo == editedTodo }"
+            >
+              <div class="view">
+                <input class="toggle" type="checkbox" v-model="todo.completed" />
+                <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
+                <!-- 删除按钮,功能:将该todo从todostorage中删除,同时不在todolist中显示 -->
+                <button class="destroy" @click="removeTodo(todo)"></button>
+              </div>
+              <!-- 专门用于编辑todo的栏 -->
+              <!-- 当按回车/焦点离开时触发doneEdit()编辑成功函数-->
+              <!-- 当按esc时触发cancelEdit函数取消编辑-->
+              <!-- 相对定位布局 -->
+              <!-- 编辑区域的绑定和显示的数据是v-model="todo.title"-->
+              <!-- v-todo-focus为自定义私有指令,该指令的作用是 -->
+              <input
+                class="edit"
+                type="text"
+                v-model="todo.title"
+                v-todo-focus="todo == editedTodo"
+                @blur="doneEdit(todo)"
+                @keyup.enter="doneEdit(todo)"
+                @keyup.esc="cancelEdit(todo)"
+              />
+            </li>
+          </ul>
+        </section>
+  
+        <!-- app底部 -->
+        <footer class="footer" v-show="todos.length" v-cloak>
+          <!-- 对未完成todo进行计数 remaining就是计数值(计算属性),过滤器的作用:如果为true则返回item,否则返回items-->
+          <span class="todo-count">
+            <strong>{{ remaining }}</strong> {{ remaining | pluralize }} left
+          </span>
+
+          <!-- 根据条件过滤显示todos -->
+          <ul class="filters">
+            <li>
+              <!-- 显示所有todos-->
+              <!-- 用户按下该a标签,url后面会添加上#/all,页面不会重载,但浏览器监听到该事件,将app.visibility=all-->
+              <a href="#/all" :class="{ selected: visibility == 'all' }">All</a>
+            </li>
+            <li>
+              <!-- 显示未完成todos -->
+              <a href="#/active" :class="{ selected: visibility == 'active' }">Active</a>
+            </li>
+            <li>
+              <!-- 显示所有已完成的todos -->
+              <a href="#/completed" :class="{ selected: visibility == 'completed' }">Completed</a>
+            </li>
+          </ul>
+  
+          <!-- clear-completed按钮 -->
+          <!-- 功能:将已完成todo从todolist中清空-->
+          <!-- 单击触发事件@removeCompleted函数-->
+          <!-- 如果todos的总个数大于未完成的个数(说明有已完成的todo)时显示出来(通过v-show属性)-->
+          <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">Clear completed</button>
+  
+        </footer>
+      </section>
+
+      <script>
+        //这部分和后端交互，需要修改
+        //添加localStorage
+        const STORAGE_KEY = "todos-vuejs-2.0";
+        //定义一个todoStorage对象(对localStorage对象进行操作),拥有fetch数据和save数据的功能
+        let todoStorage = {
+          fetch: function() {
+            //从localStorage中取出数据给到todos,取出的数据需要json.parse()
+            let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            //迭代JSON对象:todos,为他的每个元素添加id(就是他的索引号)
+            todos.forEach(function(todo, index) {
+              todo.id = index;
+            });
+
+            //给localStorage对象添加属性uid：todos对象的长度
+            todoStorage.uid = todos.length;
+            return todos;
+          },
+          //将todos存到localStorage中
+          save: function(todos) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+          }
+        };
+
+        //三种过滤显示all,active,completed的过滤函数
+        let filters = {
+          //返回所有todos数据
+          all: function(todos) {
+            return todos;
+          },
+          //过滤出未完成的todos
+          //todos.filter(过滤条件)
+          //过滤条件:返回todo.completed=false的todo
+          active: function(todos) {
+            return todos.filter(function(todo) {
+              return !todo.completed;
+            });
+          },
+          //过滤出已完成的todos
+          completed: function(todos) {
+            return todos.filter(function(todo) {
+              return todo.completed;
+            });
+          }
+        };
+  
+        let app = new Vue({
+          // app initial state
+          //vue对象的数据部分,该网页的初始化数据状态
+          data: {
+            todos: todoStorage.fetch(), //每次使用todo时，都从localStorage中获取todo数据
+            newTodo: "",    //input中正正在编辑的数据
+            editedTodo: null,   //编辑todo时的数据
+            visibility: "all"   //初始化visibility为all
+          },
+  
+          // watch todos change for localStorage persistence
+          //监视todos属性和deep属性,当他们的值改变时,触发
+          watch: {
+            //当todos数据改变时,同步将todos数据存储到localStorage中
+            todos: {
+              handler: function(todos) {
+                todoStorage.save(todos);
+              },
+              deep: true    //开启深度监听,因为todos是一个对象
+            }
+          },
+  
+          //计算属性,将data中的数据放到这里来,对其添加及时触发函数
+          //计算属性可以作为数据来使用
+          //当computed函数内部数据发生变化时,会重新执行函数
+          computed: {
+            //根据过滤选项:all,active,completed过滤出数据给到todos让其迭代显示
+            //当用户点击all,active,copmleted标签时,visibility通过onHashChange函数改变,触发filteredTodo()获取新的todos
+            filteredTodos: function() {
+              return filters[this.visibility](this.todos);
+            },
+            //调用filters对象的active方法,对todos对象(从localStorage中取出的todos)进行操作
+            //用es6的语法使用json对象中的函数
+            //该属性的作用:显示未完成事项的个数
+            //调用filters.active()获取已完成或未完成的todos的个数
+            remaining: function() {
+              return filters.active(this.todos).length;
+            },
+            
+            //当全选按钮被勾选时触发alldone函数
+            //将所有的todo.completed都设置成true
+            allDone: {
+              //当需要读取当前值时执行get(),如果todolist为0项,则返回true
+              get: function() {
+                return this.remaining === 0;
+              },
+              //全选按钮被勾选,触发allDone(),value是传进来的input标签的值:为1
+              //将所有todo的todo.completed设置为true
+              set: function(value) {
+                this.todos.forEach(function(todo) {
+                  todo.completed = value;
+                });
+              }
+            }
+          },
+  
+          //定义私有过滤器
+          filters: {
+            //如果n等于1则返回item,否则返回items
+            pluralize: function(n) {
+              return n === 1 ? "item" : "items";
+            }
+          },
+  
+          //v-on绑定的事件触发时执行的函数
+          methods: {
+            //增事件函数
+            //判断用户是否输入了内容,若未输入则直接return None,如果输入了则再todos对象的末尾添加fauns,返回todos的长度
+            //this指代vue实例
+            addTodo: function() {
+              //将用户正在输入的值：newTodo,value为判断是否输入了值，若为true则是有值
+              let value = this.newTodo && this.newTodo.trim();
+              if (!value) {
+                return;
+              }
+              //this代表vue实例本身
+              //在对象的末尾添加元素(有三个属性:id,title,completed),返回值为对象的长度
+              //将todo的title设为v-model:newtodo这个输入的值
+              this.todos.push({
+                id: todoStorage.uid++,
+                title: value,
+                completed: false
+              });
+              //添加完之后清空该标签内容
+              this.newTodo = "";
+            },
+            
+            //删除todo的函数
+            //this.todos.indexof(todo):返回要删除的todo在todos中的index
+            //todos.splice(index,1):删除该index处的元素,删除一次
+            removeTodo: function(todo) {
+              this.todos.splice(this.todos.indexOf(todo), 1);
+            },
+
+            //双击事件触发编辑todo函数
+            //给正在编辑的标签中显示该todo的todo.title
+            //editedTodo数据=该todo
+            editTodo: function(todo) {
+              //这里的beforeEditCache和editedTodo好像是全局变量?
+              this.beforeEditCache = todo.title;
+              this.editedTodo = todo;
+            },
+            
+            //编辑todo成功时触发的函数
+            //当焦点离开编辑区域或keyup时触发
+            //如果编辑的todo.title被删除了,则从todos中删除该todo
+            doneEdit: function(todo) {
+              //如果没有编辑对象,直接退出doneEdit()
+              if (!this.editedTodo) {
+                return;
+              }
+              //将编辑内容对象editedTodo重置成null,将用户编辑中可能输入的前后空格删除
+              this.editedTodo = null;
+              todo.title = todo.title.trim();
+              //如果todo.title被删除,说明用户想删掉这个todo,触发删除todo函数
+              if (!todo.title) {
+                this.removeTodo(todo);
+              }
+            },
+  
+            //当按esc时触发cancelEdit函数,此时将editTodo属性重置为null
+            //并且还原todo.title
+            cancelEdit: function(todo) {
+              this.editedTodo = null;
+              todo.title = this.beforeEditCache;
+            },
+            
+            //清除已完成的todo的函数
+            //单击clear_completed时触发
+            removeCompleted: function() {
+              this.todos = filters.active(this.todos);
+            }
+          },
+  
+          //自定义私有指令
+          //用于双击编辑文本框是获取焦点
+          directives: { 
+            //文本框双击获取焦点
+            //如果binding为true,获取焦点
+            "todo-focus": function(el, binding) { 
+              if (binding.value) {
+                el.focus();
+              }
+            }
+          }
+        });
+  
+        // 处理路由
+        //将标识符(all,active,cpompleted)赋值给Vue的实例app的visibility属性赋值
+        //不存在标识符时默认visibility=all
+        function onHashChange() {
+          //读取#锚后面的标识符并赋值给visibility
+          let visibility = window.location.hash.replace(/#\/?/, "");
+          if (filters[visibility]) {
+            app.visibility = visibility;
+          } else {
+            window.location.hash = "";
+            app.visibility = "all";
+          }
+        }
+        
+        //添加onHashChange函数监听
+        window.addEventListener("hashchange", onHashChange);
+        onHashChange();
+  
+        // mount
+        app.$mount(".todoapp");
+      </script>
+      
+</body>
+</html>

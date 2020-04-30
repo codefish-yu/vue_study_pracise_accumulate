@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>属性指令</title>
+</head>
+<body>
+    <div id="app">
+        <p id="p1" class="p1">属性指令1</p>
+        <p id="p2" v-bind:class="p1">属性指令2</p>
+        <!-- 自定义属性也可以被v-bind绑定 -->
+        <p v-bind:index="p1">绑定自定义属性1</p>
+        <!-- v-bind:属性名="变量"简写：:属性名='变量' -->
+        <p :index="p1">绑定自定义属性2</p>
+
+    </div>
+</body>
+<script src="static/js/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            p1: 'q1'
+        }
+    })
+</script>
+</html>
